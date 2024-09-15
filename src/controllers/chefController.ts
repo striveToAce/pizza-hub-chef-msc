@@ -1,42 +1,27 @@
 import { Request, Response } from 'express';
-import { startOrderPreparationService, completeOrderService } from '../services/chefService';
+import { calculateOrderEstimationService } from '../services/chefService';
 
 /**
- * Start preparing an order (move from PENDING to IN_PROGRESS)
+ * Calculate the estimated time for an order.
  * @param req - Express request object
  * @param res - Express response object
- * @returns The updated order
+ * @returns The estimated time in minutes.
  */
-export const startPreparingOrder = async (req: Request, res: Response) => {
+export const calculateOrderEstimationTime = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    // Start preparing the order
-    const updatedOrder = await startOrderPreparationService(id);
-    return res.status(200).json(updatedOrder);
+    // Call the service function to calculate the estimation time
+    const estimatedTime = await calculateOrderEstimationService(id);
+
+    // Return the estimated time in the response
+    return res.status(200).json({
+      message: `The estimated time for order ${id} is ${estimatedTime} minutes.`,
+      estimatedTime,
+    });
   } catch (error) {
-    // Return an error message if starting the order fails
-    return res.status(500).json({ error: "Error in starting order" });
-  }
-};
-
-/**
- * Complete an order (move from IN_PROGRESS to COMPLETED)
- * @param req - Express request object
- * @param res - Express response object
- * @returns The updated order
- */
-export const completeOrder = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  try {
-    // Update the order status to COMPLETED
-    const updatedOrder = await completeOrderService(id);
-
-    // Return the updated order
-    return res.status(200).json(updatedOrder);
-  } catch (error) {
-    // Return an error message if completing the order fails
-    return res.status(500).json({ error: "Error in completing order" });
+    // Return an error message if anything goes wrong
+    console.error(`Error calculating estimation time for order ${id}:`, error);
+    return res.status(500).json({ error: `Error calculating estimation time for order ${id}.` });
   }
 };

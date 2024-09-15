@@ -1,12 +1,9 @@
 import { Router } from 'express';
-import { startPreparingOrder, completeOrder } from '../controllers/chefController';
+import { calculateOrderEstimationTime } from '../controllers/chefController';
 
 const router = Router();
 
-// Start preparing an order
-router.post('/start/:id', startPreparingOrder);
-
-// Complete an order
-router.post('/complete/:id', completeOrder);
+// Route to calculate estimated time for an order
+router.get('/estimate-time/:id', calculateOrderEstimationTime);
 
 export default router;
