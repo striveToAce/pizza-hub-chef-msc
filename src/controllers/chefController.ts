@@ -12,11 +12,10 @@ export const calculateOrderEstimationTime = async (req: Request, res: Response) 
 
   try {
     // Call the service function to calculate the estimation time
-    const estimatedTime = await calculateOrderEstimationService(id);
+    const estimatedTime = await calculateOrderEstimationService();
 
     // Return the estimated time in the response
     return res.status(200).json({
-      message: `The estimated time for order ${id} is ${estimatedTime} minutes.`,
       estimatedTime,
     });
   } catch (error) {

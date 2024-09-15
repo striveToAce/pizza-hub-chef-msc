@@ -99,7 +99,7 @@ export const processPizza = async () => {
 };
 
 
-export const calculateOrderEstimationService = async (orderId: string): Promise<number> => {
+export const calculateOrderEstimationService = async (): Promise<number> => {
   // Fetch all PENDING and IN_PROGRESS orders
   const pendingOrInProgressOrders = await prisma.order.findMany({
     where: {
@@ -114,18 +114,9 @@ export const calculateOrderEstimationService = async (orderId: string): Promise<
     return total + order.pizzaCount;
   }, 0);
 
-  // Fetch the specific order for which we are calculating the time
-  const currentOrder = await prisma.order.findUnique({
-    where: { id: orderId },
-  });
-
-  if (!currentOrder) {
-    throw new Error(`Order with ID ${orderId} not found.`);
-  }
-
   // Calculate the estimated time for the current order
   // Assuming each pizza takes 5 minutes to prepare
-  const estimatedTime = (totalPizzasInAllOrders + currentOrder.pizzaCount) * 5;
+  const estimatedTime = (totalPizzasInAllOrders) * 5;
 
   return estimatedTime; // Total estimated time in minutes
 };
