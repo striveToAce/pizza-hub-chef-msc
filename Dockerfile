@@ -13,8 +13,20 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Expose port 3000 for the application
+# Copy the environment file
+COPY .env .env
+
+# Generate Prisma Client with the correct binary targets
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+# Run Prisma migrations
+RUN npx prisma migrate deploy
+
+# Run TypeScript build
+RUN npm run build
+
+# Expose port 3003
 EXPOSE 3003
 
-# Command to run your app
+# Start the application
 CMD ["npm", "run", "start"]
