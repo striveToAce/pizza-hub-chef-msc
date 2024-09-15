@@ -35,31 +35,28 @@ export const completeSinglePizzaService = async (orderId: string) => {
   }
 
   // Check if there are pizzas to be processed
-  if (order.pizzaCount === 0) {
+  if (order.estimatedCompletionTime===0) {
     throw new Error(`No pizzas left to process for order ${orderId}.`);
   }
 
   // Reduce pizza count by 1
-  const updatedPizzaCount = order.pizzaCount - 1;
+  const updatedEstimated  = order.estimatedCompletionTime-5;
 
   // Determine the new status
   let updatedStatus = 'IN_PROGRESS' as OrderStatus; // Default to 'IN_PROGRESS' after starting preparation
-  if (updatedPizzaCount === 0) {
+  if (updatedEstimated === 0) {
     updatedStatus = 'COMPLETED' as OrderStatus; // If no more pizzas left, mark the order as 'COMPLETED'
   } else if (order.status === 'PENDING') {
     updatedStatus = 'IN_PROGRESS' as OrderStatus; // If the order was 'PENDING', it should move to 'IN_PROGRESS'
   }
-
-  // Calculate the new estimated completion time (5 minutes per remaining pizza)
-  const newEstimatedCompletionTime = updatedPizzaCount * 5;
+;
 
   // Update the order in the database
   const updatedOrder = await prisma.order.update({
     where: { id: orderId },
     data: {
-      pizzaCount: updatedPizzaCount,
       status: updatedStatus,
-      estimatedCompletionTime: newEstimatedCompletionTime,
+      estimatedCompletionTime: updatedEstimated,
     },
   });
 
@@ -85,10 +82,8 @@ export const processPizza = async () => {
     // Complete one pizza from the order
     const updatedOrder = await completeSinglePizzaService(order.id);
 
-    console.log(`Completed one pizza from order ${order.id}. Remaining pizzas: ${updatedOrder.pizzaCount}`);
-
     // Check if all pizzas are done or if the order is still in progress
-    if (updatedOrder.pizzaCount === 0) {
+    if (updatedOrder.estimatedCompletionTime === 0) {
       console.log(`Order ${order.id} is now fully completed.`);
     } else {
       console.log(`Order ${order.id} is still in progress. Estimated completion time updated to ${updatedOrder.estimatedCompletionTime}.`);
@@ -110,13 +105,13 @@ export const calculateOrderEstimationService = async (): Promise<number> => {
   });
 
   // Calculate the total number of pizzas across all pending or in-progress orders
-  const totalPizzasInAllOrders = pendingOrInProgressOrders.reduce((total, order) => {
-    return total + order.pizzaCount;
+  const totalTime = pendingOrInProgressOrders.reduce((total, order) => {
+    return total + order.estimatedCompletionTime;
   }, 0);
 
   // Calculate the estimated time for the current order
   // Assuming each pizza takes 5 minutes to prepare
-  const estimatedTime = (totalPizzasInAllOrders) * 5;
+  const estimatedTime = totalTime;
 
   return estimatedTime; // Total estimated time in minutes
 };

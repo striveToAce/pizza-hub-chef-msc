@@ -10,7 +10,7 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 
-app.use('/chef', chefRoutes);
+app.use('/api/pizza-fusion/chef', chefRoutes);
 
 // Schedule a cron job to process one pizza every 5 minutes
 cron.schedule('*/5 * * * *', () => {
