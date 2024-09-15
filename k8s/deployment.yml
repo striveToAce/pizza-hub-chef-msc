@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizza-fusion-chef
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pizza-fusion-chef
+  template:
+    metadata:
+      labels:
+        app: pizza-fusion-chef
+    spec:
+      containers:
+      - name: pizza-fusion-chef
+        image: docker.io/docker380431/pizza-fusion-chef-msc:latest
+        ports:
+        - containerPort: 3003
+        envFrom:
+        - configMapRef:
+            name: pizza-fusion-config

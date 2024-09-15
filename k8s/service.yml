@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pizza-fusion-chef-service
+spec:
+  selector:
+    app: pizza-fusion-chef
+  ports:
+    - protocol: TCP
+      port: 3003
+      targetPort: 3003
+  type: ClusterIP
